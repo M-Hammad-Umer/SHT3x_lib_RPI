@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-
+#define DEVICE_ADDRESS 0x44
 
 typedef struct SHT3x
 {

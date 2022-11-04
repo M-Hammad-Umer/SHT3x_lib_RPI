@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
+#include <pigpio.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -14,7 +13,7 @@ static uint8_t calculate_crc(const uint8_t *data, size_t length);
 
 
 /////////////////////PUBLIC FUNCTION DEFINITION/////////////////////
-SHT3x_Results_t getReadings(int file)
+SHT3x_Results_t getReadings(int fd)
 {
     SHT3x_Results_t SHT3x;
 
@@ -23,13 +22,13 @@ SHT3x_Results_t getReadings(int file)
 	char config[2] = {0};
 	config[0] = 0x2C;
 	config[1] = 0x06;
-	write(file, config, 2);
+	i2cWriteDevice(fd, config, 2);
 	sleep(1);
  
 	// Read 6 bytes of data
 	// temp msb, temp lsb, temp CRC, humidity msb, humidity lsb, humidity CRC
 	char data[6] = {0};
-	if(read(file, data, 6) != 6)
+	if(i2cReadDevice(fd, data, 6) != 6)
 	{
 		printf("Error : Input/output Error \n");
 	}

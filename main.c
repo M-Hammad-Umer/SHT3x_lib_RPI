@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
+#include <pigpio.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -9,8 +8,7 @@
 
 
 // Create I2C bus
-static int file;
-char *bus = "/dev/i2c-1";
+uint8_t fd;
 double temp;
 double humidity;
  
@@ -18,20 +16,20 @@ double humidity;
 int main() 
 {
 
-	if((file = open(bus, O_RDWR)) < 0) 
+	if(gpioInitialise() < 0) 
 	{
 		printf("Failed to open the bus. \n");
-		exit(1);
-	}
-	ioctl(file, I2C_SLAVE, 0x44);	
+	}	
+	fd = i2cOpen(1, DEVICE_ADDRESS, 0);
 	SHT3x_Results_t SHT3x;
 
 	while(1)
 	{
-		SHT3x = getReadings(file);
+		SHT3x = getReadings(fd);
 		printf("Temp = %f		Humidity = %f\n", SHT3x.temp , SHT3x.humidity);
 	}
 }
+
 
 
 
